@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Auth, API } from "aws-amplify";
 
 import ChatItem from './ChatItem';
@@ -7,20 +7,22 @@ import NewChatButton from './NewChatButton';
 
 const ChatList = ({ onSelect, selectedChat, onProcessing, onSetProcessing, onSetSelectedChat }) => {
   const [chats, setChats] = useState([]);
-  const [token, setToken] = useState("");
 
   useEffect(() => {
     onSetProcessing(true);
     
     (async () => {
-        const getChats = await API.get("api", "/chats");
-        setChats(getChats.message);
-        onSetProcessing(false);
-    })();
+        try {
+            const getChats = await API.get("api", "/chats");
 
-    (async () => {
-        const token = (await Auth.currentSession()).getAccessToken().getJwtToken();
-        setToken(token);
+            if (getChats?.error)
+                throw (getChats.message);
+
+            setChats(getChats.message);
+        } catch(error) {
+            console.log("###ERROR: ", error.message || error)
+        }
+        onSetProcessing(false);
     })();
   }, []);
 
@@ -38,8 +40,10 @@ const ChatList = ({ onSelect, selectedChat, onProcessing, onSetProcessing, onSet
                 name: newName
             },
             headers: {
-                Authorization: `Bearer ${token}`,
-            },
+                Authorization: `Bearer ${(await Auth.currentSession())
+                  .getAccessToken()
+                  .getJwtToken()}`,
+              },
         }
     );
 
@@ -67,8 +71,10 @@ const ChatList = ({ onSelect, selectedChat, onProcessing, onSetProcessing, onSet
         `/chat/${id}`,
         { 
             headers: {
-                Authorization: `Bearer ${token}`,
-            },
+                Authorization: `Bearer ${(await Auth.currentSession())
+                  .getAccessToken()
+                  .getJwtToken()}`,
+              },
         }
     );
     
@@ -95,8 +101,10 @@ const ChatList = ({ onSelect, selectedChat, onProcessing, onSetProcessing, onSet
         { 
             body: { name: name },
             headers: {
-                Authorization: `Bearer ${token}`,
-            },
+                Authorization: `Bearer ${(await Auth.currentSession())
+                  .getAccessToken()
+                  .getJwtToken()}`,
+              },
         }
       );
 
@@ -107,15 +115,18 @@ const ChatList = ({ onSelect, selectedChat, onProcessing, onSetProcessing, onSet
 
   return (
     <div className="overflow-y-auto">
-      {(!chats || chats?.length < 1) &&
-        <div className='w-4/5 m-auto'>
-          <p className='text-center font-bold text-red-500 border-2 rounded-md my-8'>No Chats so far</p>
-        </div>
-      }
-      {chats?.length > 0 && chats.map(chat => (
-        <ChatItem selected={chat.id == selectedChat?.id} key={chat.id} chat={chat} 
-            onSelect={onSelect} onUpdate={updateChat} onDelete={deleteChat} />
-      ))}
+        {(chats.length < 1)
+            ?
+                <div className='w-4/5 m-auto'>
+                    <p className='text-center font-bold text-red-500 border-2 rounded-md my-8'>No Chats so far</p>
+                </div>
+            :
+                chats.map(chat => (
+                    <ChatItem selected={chat.id == selectedChat?.id} key={chat.id} chat={chat} 
+                        onSelect={onSelect} onUpdate={updateChat} onDelete={deleteChat} />
+                ))
+        }
+
       <NewChatButton onCreate={createChat} onProcessing={onSetProcessing} processing={onProcessing} />
     </div>
   );

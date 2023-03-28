@@ -1,4 +1,4 @@
-import { Amplify, Auth } from "aws-amplify";
+import { Amplify } from "aws-amplify";
 import { Authenticator } from "@aws-amplify/ui-react";
 
 import App from "./App.jsx";
@@ -22,6 +22,8 @@ const amplifyConfig = {
     },
   };
 Amplify.configure(amplifyConfig);
+
+// console.log("amplifyConfig=== ", amplifyConfig)
 
 export default function AppAuthProvider() {
     return (

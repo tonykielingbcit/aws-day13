@@ -7,17 +7,6 @@ import "@aws-amplify/ui-react/styles.css";
 export default function Login() {
     const { route } = useAuthenticator((context) => [context.route]);
 
-
-    // const [token, setToken] = useState("");
-    //   useEffect(() => {
-    //     (async () => {
-    //         const token = (await Auth.currentSession()).getAccessToken().getJwtToken();
-    //         setToken(token);
-    //     })();
-    //   }, []);
-
-
-
     if (route == "idle") {
         return <></>;
     }

@@ -1,17 +1,12 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { useAuthenticator } from "@aws-amplify/ui-react";
 
 const NewChatButton = ({ onCreate, processing }) => {
   const [isCreating, setIsCreating] = useState(false);
   const [name, setName] = useState('');
   const inputRef = useRef(null);
-  const { route } = useAuthenticator((context) => [context.route]);
-  const [notLogged, setNotLogged] = useState(true);
 
-
-  useEffect(() => {
-      setNotLogged((route !== "authenticated" ? true : false));
-  }, []);
+  const { user } = useAuthenticator((context) => [context.user]);
 
   const handleCreate = () => {
     if (name.trim() !== '') {
@@ -28,7 +23,7 @@ const NewChatButton = ({ onCreate, processing }) => {
   }
 
   const handleClick = () => {
-    if (notLogged) {
+    if (!user) {
         alert("Login first, please");
         return;
     }

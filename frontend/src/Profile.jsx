@@ -4,7 +4,7 @@ import { Navigate } from "react-router-dom";
 
 import "@aws-amplify/ui-react/styles.css";
 
-export default function Profile({ onLeaveApp }) {
+export default function Profile() {
     const { user, signOut } = useAuthenticator((context) => [context.user]);
 // console.log("user- ", user)
 
@@ -29,9 +29,9 @@ export default function Profile({ onLeaveApp }) {
                         <p className="ml-8 text-lg font-bold">Email: {user.attributes.email}</p>
                         <button 
                             className="w-32 mt-4 ml-8 border-2 bg-red-500 rounded-md p-2 hover:font-bold"
-                            // onClick={signOut}
+                            onClick={signOut}
                             // onClick={leave}
-                            onClick={onLeaveApp}
+                            // onClick={onLeaveApp}
                             title="Close Session"
                         >
                             Sign Out

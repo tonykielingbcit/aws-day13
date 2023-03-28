@@ -1,12 +1,12 @@
 import { BrowserRouter, Link, Route, Routes } from 'react-router-dom';
-import { Amplify, Auth } from "aws-amplify";
+// import { Amplify, Auth } from "aws-amplify";
 // import { Authenticator } from "@aws-amplify/ui-react";
 
 
 import ChatGPT from './ChatGPT/ChatGPT'
 import Login from './Login';
 import Profile from './Profile';
-import { useEffect, useState } from 'react';
+// import { useEffect, useState } from 'react';
 import RouteGuard from "./RouteGuard";
 
 import { useAuthenticator } from "@aws-amplify/ui-react";
@@ -37,7 +37,7 @@ import { useAuthenticator } from "@aws-amplify/ui-react";
 export default function App() {
     // const [token, setToken] = useState("");
 
-    const { user, signOut } = useAuthenticator(context => [context.user]);
+    const { user } = useAuthenticator(context => [context.user]);
 
     // useEffect(() => {
     //     (async () => {
@@ -47,13 +47,13 @@ export default function App() {
     // }, []);
     // }, [token, user]);
 
-    const leaveApp = () => {
-        // console.log("leavinggggggggggggggggggggg ")
-        // setToken(prev => false);
-        signOut();
-        // return ({msg: "test"});
-        // return <Navigate to="/" />;   
-    }
+    // const leaveApp = () => {
+    //     // console.log("leavinggggggggggggggggggggg ")
+    //     // setToken(prev => false);
+    //     signOut();
+    //     // return ({msg: "test"});
+    //     // return <Navigate to="/" />;   
+    // }
 
 
     return (
@@ -66,17 +66,14 @@ export default function App() {
                                 <Link to="/">Home</Link>
                             </li>
 
-                            {/* {!user &&
-                                <li>
-                                    <Link to="/login">Register / Login</Link>
-                                </li>
-                            } */}
-
                             {user
                                 ?
-                                    <li>
-                                        <Link to="/profile">Profile</Link>
-                                    </li>
+                                    <>
+                                        <h3>Hi {user.username}</h3>
+                                        <li>
+                                            <Link to="/profile">Profile</Link>
+                                        </li>
+                                    </>
                                 :
                                     <li>
                                         <Link to="/login">Register / Login</Link>
@@ -92,7 +89,7 @@ export default function App() {
                         <Routes>
                             <Route path="/" element={<ChatGPT />} />
                             <Route path="/login" element={<Login />} />
-                            <Route path="/profile" element={<RouteGuard><Profile onLeaveApp={leaveApp} /></RouteGuard>} />
+                            <Route path="/profile" element={<RouteGuard><Profile /></RouteGuard>} />
                             <Route path="/about" element={<div className='m-auto'>About</div>} />
                         </Routes>
                     </main>

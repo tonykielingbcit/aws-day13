@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import { useRef, useState } from 'react';
 import { EditIcon, TrashIcon } from './Icons';
 import { useAuthenticator } from "@aws-amplify/ui-react";
 
@@ -10,16 +10,7 @@ const MessageItem = ({ message, onUpdate, onDelete }) => {
   const inputRef = useRef(null);
   const tempMessage = message.content;
 
-
   const { user } = useAuthenticator(context => [context.user]);
-
-//   const { route } = useAuthenticator((context) => [context.route]);
-//   const [notLogged, setNotLogged] = useState(true);
-//   useEffect(() => {
-//       setNotLogged((route !== "authenticated" ? true : false));
-//   }, []);
-
-
 
   const handleUpdate = async () => {
     const updatingMessage = await onUpdate(message.id, content);

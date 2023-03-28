@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Message from './MessageItem';
 import { Auth, API } from "aws-amplify";
 import { useAuthenticator } from "@aws-amplify/ui-react";
@@ -8,27 +8,22 @@ const ChatWindow = ({chat, onProcessing, onSetProcessing }) => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const inputRef = useRef(null);
-  const [token, setToken] = useState("");
 
-  const { route } = useAuthenticator((context) => [context.route]);
-  const [notLogged, setNotLogged] = useState(true);
-  useEffect(() => {
-      setNotLogged((route !== "authenticated" ? true : false));
-  }, []);
+  const { user } = useAuthenticator((context) => [context.user]);
 
   useEffect(() => {
     onSetProcessing(true);
     
-    (async () => {
-        const getMessages = await API.get("api", `/messages/${chat.id}`);
-        setMessages(getMessages.message);
-        onSetProcessing(false);
-    })();
+    // (async () => {
+    //     const getMessages = await API.get("api", `/messages/${chat.id}`);
+    //     setMessages(getMessages.message);
+    //     onSetProcessing(false);
+    // })();
 
-    (async () => {
-        const token = (await Auth.currentSession()).getAccessToken().getJwtToken();
-        setToken(token);
-    })();
+    API.get("api", `/messages/${chat.id}`)
+        .then(res => setMessages(res.message))
+        .then(onSetProcessing(false));
+
   }, [chat]);
 
   
@@ -39,7 +34,7 @@ const ChatWindow = ({chat, onProcessing, onSetProcessing }) => {
         return;
     }
     
-    if (notLogged) {
+    if (!user) {
         alert("Login first, please");
         return;
     }
@@ -56,12 +51,12 @@ const ChatWindow = ({chat, onProcessing, onSetProcessing }) => {
                 content: input
              },
             headers: {
-                Authorization: `Bearer ${token}`,
-            },
+                Authorization: `Bearer ${(await Auth.currentSession())
+                  .getAccessToken()
+                  .getJwtToken()}`,
+              },
         }
     );
-
-    // console.log("addingMessage::: ", addingMessage)
 
     if (addingMessage.error) {
         alert("Sorry, this chat does not belong to you \ntherefore you CANNOT ADD MESSAGES TO IT.");
@@ -88,8 +83,10 @@ const ChatWindow = ({chat, onProcessing, onSetProcessing }) => {
                 content
              },
             headers: {
-                Authorization: `Bearer ${token}`,
-            },
+                Authorization: `Bearer ${(await Auth.currentSession())
+                  .getAccessToken()
+                  .getJwtToken()}`,
+              },
         }
     );
 
@@ -114,8 +111,10 @@ const ChatWindow = ({chat, onProcessing, onSetProcessing }) => {
         `/message/${id}`,
         { 
             headers: {
-                Authorization: `Bearer ${token}`,
-            },
+                Authorization: `Bearer ${(await Auth.currentSession())
+                  .getAccessToken()
+                  .getJwtToken()}`,
+              },
         }
     );
 

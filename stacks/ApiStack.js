@@ -18,6 +18,11 @@ export function API({ stack }) {
       },
       defaults: {
         authorizer: "jwt",
+        function: {
+            environment: {
+              DATABASE_URL: process.env.DATABASE_URL,
+            },
+          },
       },
     routes: {
       "GET /chats": {
